@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2026 AI·SW체험 수피아여고 포토부스</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <main class="booth">
+    <!-- 촬영 화면 (좌측) -->
+    <section class="stage">
+      <video id="video" autoplay playsinline muted></video>
+      <canvas id="shot" hidden></canvas>
+      <div class="grid"></div>
+      <span class="corner tl"></span>
+      <span class="corner tr"></span>
+      <span class="corner bl"></span>
+      <span class="corner br"></span>
+      <span class="live"><i></i>LIVE</span>
+    </section>
+
+    <!-- 안내 패널 (우측) -->
+    <aside class="panel">
+      <button id="fullscreenBtn" class="fs-btn" type="button">⛶ 전체화면</button>
+
+      <div class="intro">
+        <span class="school">SPEER HIGH SCHOOL</span>
+        <h1>2026 AI·SW체험<br />수피아여고 포토부스</h1>
+        <p class="guide">카메라를 바라보고 버튼을 눌러주세요</p>
+        <button id="captureBtn" class="capture-btn" type="button">촬영하기</button>
+      </div>
+
+      <p id="status" class="status" role="status"></p>
+    </aside>
+  </main>
+
+  <!-- 결과 모달 -->
+  <div id="resultModal" class="modal" hidden>
+    <div class="modal-card">
+      <div class="receipt-frame">
+        <canvas id="preview"></canvas>
+      </div>
+
+      <div class="modal-info">
+        <div>
+          <h2>영수증 사진이 완성되었습니다! 🎉</h2>
+          <p class="desc">미리보기는 선명한 컬러로 확인하실 수 있으며, 인쇄 시 감열 영수증 전용 지그재그 점묘화 3.0x 디더링으로 즉시 출력됩니다.</p>
+        </div>
+
+        <!-- 관리자 설정: 주소 뒤에 ?admin=1 을 붙였을 때만 표시 -->
+        <div id="admin" class="admin" hidden>
+          <label>
+            디더링
+            <select id="dithering">
+              <option value="atkinson">Atkinson (밝고 깨끗)</option>
+              <option value="floyd">Floyd-Steinberg (디테일)</option>
+              <option value="bayer">Bayer (점묘)</option>
+            </select>
+          </label>
+          <label>
+            농도 (DC2 # n): <span id="densityVal"></span>
+            <input type="range" id="density" min="0" max="31" step="1" />
+          </label>
+          <label>
+            대비: <span id="contrastVal"></span>
+            <input type="range" id="contrast" min="0.8" max="2" step="0.05" />
+          </label>
+          <label>
+            감마: <span id="gammaVal"></span>
+            <input type="range" id="gamma" min="0.5" max="1.4" step="0.05" />
+          </label>
+          <label>
+            사진 파일로 테스트
+            <input type="file" id="fileInput" accept="image/*" />
+          </label>
+        </div>
+
+        <div class="modal-actions">
+          <button id="printBtn" class="print-btn" type="button">🖨️ 영수증 인쇄하기</button>
+          <button id="retryBtn" class="retry-btn" type="button">다시 촬영하기</button>
+          <p id="printStatus" class="print-status" role="status"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
