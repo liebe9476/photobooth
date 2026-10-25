@@ -1,6 +1,7 @@
 import { renderReceipt, drawPreview, DEFAULT_OPTIONS } from './printer-raster.js';
 import { connectPrinter, sendBytes, isConnected } from './printer-usb.js';
 import { composeReceipt } from './receipt-layout.js';
+import { isBridgeAlive, sendViaBridge } from './print-bridge.js';
 
 // ---------- DOM ----------
 const $ = (id) => document.getElementById(id);
