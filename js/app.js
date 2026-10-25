@@ -127,15 +127,12 @@ function openResult(photo) {
   updatePreview();
 }
 
+// 미리보기: 컬러 영수증을 그대로 표시 (디더링은 인쇄 데이터에만 적용)
 function updatePreview() {
   if (!receiptCanvas) return;
-  try {
-    const { preview: p } = renderReceipt(receiptCanvas, currentOptions());
-    drawPreview(preview, p.bits, p.width, p.height);
-  } catch (e) {
-    console.error(e);
-    setPrintStatus('미리보기 생성 중 오류가 발생했습니다.', true);
-  }
+  preview.width = receiptCanvas.width;
+  preview.height = receiptCanvas.height;
+  preview.getContext('2d').drawImage(receiptCanvas, 0, 0);
 }
 
 function closeResult() {
@@ -151,16 +148,24 @@ async function handlePrint() {
 
   printBtn.disabled = true;
   try {
-    // 사용자 클릭 이벤트 안에서 연결해야 WebUSB 팝업이 뜸
-    if (!isConnected()) {
-      setPrintStatus('프린터를 선택해 주세요...');
-      const name = await connectPrinter();
-      setPrintStatus(`연결됨: ${name}`);
-    }
-
+    // 1) 인쇄용 ESC/POS 데이터 생성
     setPrintStatus('인쇄 데이터 생성 중...');
     const { bytes } = renderReceipt(receiptCanvas, currentOptions());
 
+    // 2) 로컬 인쇄 브리지가 켜져 있으면 Windows 프린터 드라이버로 인쇄
+    if (await isBridgeAlive()) {
+      setPrintStatus('인쇄 중 (로컬 프린터)...');
+      await sendViaBridge(bytes);
+      setPrintStatus('인쇄를 완료했습니다. 🎉');
+      return;
+    }
+
+    // 3) 브리지가 없으면 WebUSB로 직접 전송
+    if (!isConnected()) {
+      setPrintStatus('프린터를 선택해 주세요...');
+      const name = await connectPrinter(); // 사용자 클릭 직후 호출되어야 팝업이 뜸
+      setPrintStatus(`연결됨: ${name}`);
+    }
     setPrintStatus('인쇄 중...');
     await sendBytes(bytes);
     setPrintStatus('인쇄를 완료했습니다. 🎉');
